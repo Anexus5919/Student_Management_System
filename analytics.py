@@ -15,7 +15,7 @@ class Analytics:
         self.win = tk.Toplevel(parent)
         self.win.title("Analytics Dashboard")
         self.win.geometry("900x650")
-        self.win.minsize(900, 650)   # ✅ prevents toolbar clipping
+        self.win.minsize(700, 500)   # small but safe
         self.win.configure(bg="#f8fafc")
 
         self.build_ui()
@@ -29,17 +29,17 @@ class Analytics:
             bg="#f8fafc"
         ).pack(pady=15)
 
-        # ---------- FETCH DATA ----------
+        # ---------- DATA ----------
         total_students, departments, counts = self.fetch_data()
 
-        # ---------- SUMMARY CARDS ----------
+        # ---------- SUMMARY ----------
         summary = tk.Frame(self.win, bg="#f8fafc")
         summary.pack(pady=10)
 
         self.card(summary, "Total Students", total_students)
         self.card(summary, "Departments", len(departments))
 
-        # ---------- OUTER CHART FRAME ----------
+        # ---------- CHART FRAME ----------
         outer = tk.LabelFrame(
             self.win,
             text="Students per Department",
@@ -61,22 +61,17 @@ class Analytics:
 
         fig.tight_layout()
 
-        # ---------- PLOT CONTAINER ----------
-        plot_container = tk.Frame(outer)
-        plot_container.pack(fill="both", expand=True)
-
         # ---------- CANVAS ----------
-        canvas = FigureCanvasTkAgg(fig, master=plot_container)
+        canvas = FigureCanvasTkAgg(fig, master=outer)
         canvas.draw()
-        canvas.get_tk_widget().pack(fill="both", expand=True)
 
-        # ---------- TOOLBAR (FIXED & ALWAYS VISIBLE) ----------
-        toolbar_frame = tk.Frame(outer, height=40)
-        toolbar_frame.pack(fill="x")
-
-        toolbar = NavigationToolbar2Tk(canvas, toolbar_frame)
+        # ---------- TOOLBAR (ABOVE CANVAS – KEY FIX) ----------
+        toolbar = NavigationToolbar2Tk(canvas, outer)
         toolbar.update()
-        toolbar.pack(side=tk.LEFT, fill=tk.X)
+        toolbar.pack(side=tk.TOP, fill=tk.X)
+
+        # ---------- CANVAS WIDGET ----------
+        canvas.get_tk_widget().pack(fill="both", expand=True)
 
     # ---------- DATA ----------
     def fetch_data(self):
