@@ -9,28 +9,34 @@ def init_db():
     conn = get_connection()
     cur = conn.cursor()
 
+    # USERS TABLE (for login)
     cur.execute("""
-    CREATE TABLE IF NOT EXISTS users(
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        username TEXT UNIQUE,
-        password TEXT
-    )
+        CREATE TABLE IF NOT EXISTS users (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            username TEXT UNIQUE NOT NULL,
+            password TEXT NOT NULL
+        )
     """)
 
+    # STUDENTS TABLE
+    # 🔑 Composite UNIQUE constraint (department + roll)
     cur.execute("""
-    CREATE TABLE IF NOT EXISTS students(
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        name TEXT,
-        roll TEXT UNIQUE,
-        department TEXT,
-        year TEXT,
-        email TEXT
-    )
+        CREATE TABLE IF NOT EXISTS students (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            name TEXT NOT NULL,
+            roll INTEGER NOT NULL,
+            department TEXT NOT NULL,
+            year INTEGER NOT NULL,
+            email TEXT,
+            UNIQUE(department, roll)
+        )
     """)
 
-    cur.execute(
-        "INSERT OR IGNORE INTO users(username,password) VALUES('admin','admin123')"
-    )
+    # DEFAULT ADMIN USER
+    cur.execute("""
+        INSERT OR IGNORE INTO users (username, password)
+        VALUES ('admin', 'admin123')
+    """)
 
     conn.commit()
     conn.close()
